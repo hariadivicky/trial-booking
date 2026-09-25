@@ -1,0 +1,14 @@
+<header class="border-b border-gray-200 bg-white">
+  <nav class="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
+    <%= link_to "Trial Booking", root_path, class: "text-lg font-semibold" %>
+
+    <div class="flex items-center gap-4 text-sm">
+      <% if user %>
+        <span class="font-medium"><%= user.name %></span>
+        <%= button_to "Sign out", sign_out_path, method: :delete, class: "text-gray-600 hover:text-gray-900" %>
+      <% else %>
+        <%= link_to "Sign in", sign_in_path, class: "text-gray-600 hover:text-gray-900" %>
+      <% end %>
+    </div>
+  </nav>
+</header>
