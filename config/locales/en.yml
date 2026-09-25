@@ -29,3 +29,9 @@
 
 en:
   hello: "Hello world"
+  activerecord:
+    attributes:
+      booking:
+        student_id: "Child"
+      student:
+        name: "Child's name"

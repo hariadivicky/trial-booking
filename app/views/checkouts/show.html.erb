@@ -10,36 +10,52 @@
     <dd class="font-medium"><%= number_to_currency(@trial_class.price_cents / 100.0, unit: "SGD ") %></dd>
   </dl>
 
-  <%= form_with url: checkout_path(@trial_class), class: "mt-6 space-y-6" do |form| %>
+  <% if @checkout.errors.any? %>
+    <ul class="mt-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">
+      <% @checkout.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <%= form_with model: @checkout, url: checkout_path(@trial_class), class: "mt-6 space-y-6" do |form| %>
     <fieldset class="space-y-4">
       <legend class="font-semibold">About you</legend>
 
       <% if current_user %>
         <p class="text-sm">Booking as <span class="font-medium"><%= current_user.name %></span></p>
       <% else %>
-        <%= fields :parent do |parent_form| %>
-          <div>
-            <%= parent_form.label :name, "Your name", class: "block text-sm font-medium" %>
-            <%= parent_form.text_field :name, required: true, autocomplete: "name", class: "mt-1 block w-full rounded-md border border-gray-300 px-3 py-2" %>
-          </div>
+        <div>
+          <%= form.label :parent_name, "Your name", class: "block text-sm font-medium" %>
+          <%= form.text_field :parent_name, required: true, autocomplete: "name", class: "mt-1 block w-full rounded-md border border-gray-300 px-3 py-2" %>
+        </div>
 
-          <div>
-            <%= parent_form.label :email, class: "block text-sm font-medium" %>
-            <%= parent_form.email_field :email, required: true, autocomplete: "email", class: "mt-1 block w-full rounded-md border border-gray-300 px-3 py-2" %>
-          </div>
-        <% end %>
+        <div>
+          <%= form.label :parent_email, "Email", class: "block text-sm font-medium" %>
+          <%= form.email_field :parent_email, required: true, autocomplete: "email", class: "mt-1 block w-full rounded-md border border-gray-300 px-3 py-2" %>
+        </div>
+
+        <p class="text-sm text-gray-600">
+          Already have an account? <%= link_to "Sign in", sign_in_path, class: "font-medium text-indigo-600 hover:underline" %>
+        </p>
       <% end %>
     </fieldset>
 
     <fieldset class="space-y-4">
       <legend class="font-semibold">Your child</legend>
+      <% existing_students = @checkout.existing_students.to_a %>
 
-      <%= fields :student do |student_form| %>
+      <% if existing_students.any? %>
         <div>
-          <%= student_form.label :name, "Child's name", class: "block text-sm font-medium" %>
-          <%= student_form.text_field :name, required: true, class: "mt-1 block w-full rounded-md border border-gray-300 px-3 py-2" %>
+          <%= form.label :student_id, "Choose a child", class: "block text-sm font-medium" %>
+          <%= form.collection_select :student_id, existing_students, :id, :name, { include_blank: "Add a new child" }, class: "mt-1 block w-full rounded-md border border-gray-300 px-3 py-2" %>
         </div>
       <% end %>
+
+      <div>
+        <%= form.label :student_name, existing_students.any? ? "New child's name" : "Child's name", class: "block text-sm font-medium" %>
+        <%= form.text_field :student_name, required: existing_students.none?, class: "mt-1 block w-full rounded-md border border-gray-300 px-3 py-2" %>
+      </div>
     </fieldset>
 
     <%= form.submit "Book trial class", class: "w-full rounded-md bg-indigo-600 px-4 py-2 font-medium text-white hover:bg-indigo-500" %>
