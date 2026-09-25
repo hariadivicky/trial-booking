@@ -1,5 +1,6 @@
 class PaymentsController < ApplicationController
   before_action :set_booking
+  before_action :redirect_unpayable, only: :show
 
   def show
     @payment = Payment.new(booking: @booking)
@@ -20,6 +21,15 @@ class PaymentsController < ApplicationController
   private
     def set_booking
       @booking = Booking.find(params[:booking_id])
+    end
+
+    # Only a live hold can be paid; a lapsed one goes back to checkout, a settled one to its page.
+    def redirect_unpayable
+      if @booking.lapsed? || @booking.expired?
+        redirect_to checkout_path(@booking.trial_class), alert: Payment::HOLD_EXPIRED_MESSAGE
+      elsif !@booking.pending?
+        redirect_to booking_path(@booking)
+      end
     end
 
     def payment_params
