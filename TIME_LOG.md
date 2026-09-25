@@ -15,5 +15,6 @@ Time spent in each Claude Code conversation, from its first message to its last 
 | 9 | 2026-09-26 | 00:00–00:23 | 23 min | Checkout page, booking submission (seat lock, duplicate/full checks, child picker), blank pay page |
 | 10 | 2026-09-26 | 00:28–00:33 | 5 min | Pay page UI: seat hold countdown, card form with test card hints |
 | 11 | 2026-09-26 | 00:36–00:48 | 12 min | MockPaymentGateway PORO, pay a held seat (retry, idempotency key, expired hold), booking status page |
+| 12 | 2026-09-26 | 00:53–00:56 | 3 min | Checkout shows "Sorry, class is fully booked" and disables booking when no seats are left |
 
-**Total: ~106 min**
+**Total: ~109 min**
