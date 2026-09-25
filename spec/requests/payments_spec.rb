@@ -20,12 +20,29 @@ RSpec.describe "Payments", type: :request do
       assert_select "time[data-controller=countdown][datetime=?]", booking.expires_at.iso8601, text: "00:30"
     end
 
-    it "shows 00:00 once the hold has expired" do
+    it "sends the parent back to checkout once the hold lapsed, before the job expires it" do
       booking = create(:booking, expires_at: 1.minute.ago)
 
       get payment_path(booking)
 
-      assert_select "time[data-controller=countdown]", text: "00:00"
+      expect(response).to redirect_to(checkout_path(booking.trial_class))
+      expect(flash[:alert]).to eq("Your seat hold has expired. Please book again.")
+    end
+
+    it "sends the parent back to checkout once the booking expired" do
+      booking = create(:booking, status: :expired)
+
+      get payment_path(booking)
+
+      expect(response).to redirect_to(checkout_path(booking.trial_class))
+    end
+
+    it "sends the parent to the booking once it is confirmed" do
+      booking = create(:booking, status: :confirmed, payment_status: :paid)
+
+      get payment_path(booking)
+
+      expect(response).to redirect_to(booking_path(booking))
     end
 
     it "renders a card form with test card hints" do
