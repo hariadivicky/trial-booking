@@ -7,3 +7,6 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
+
+Parent.find_or_create_by!(email: "parent@example.com") { |parent| parent.name = "Jane Doe" }
+Admin.find_or_create_by!(email: "admin@example.com") { |admin| admin.name = "Admin User" }
