@@ -1,1 +1,12 @@
 <h1 class="text-2xl font-semibold">Book a trial class</h1>
+
+<% @trial_classes_by_subject.each do |class_subject, trial_classes| %>
+  <section class="mt-6">
+    <h2 class="text-lg font-semibold"><%= class_subject.name %></h2>
+    <ul class="mt-2 list-disc pl-5">
+      <% trial_classes.each do |trial_class| %>
+        <li><%= trial_class.title %></li>
+      <% end %>
+    </ul>
+  </section>
+<% end %>
