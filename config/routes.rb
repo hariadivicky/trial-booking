@@ -21,6 +21,7 @@ Rails.application.routes.draw do
   get "pay/:booking_id" => "payments#show", as: :payment
   post "pay/:booking_id" => "payments#create"
   resources :bookings, only: :show
+  get "trial_classes/:trial_class_id/roster" => "rosters#show", as: :roster
 
   root "home#index"
 end
