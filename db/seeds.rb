@@ -10,3 +10,10 @@
 
 Parent.find_or_create_by!(email: "parent@example.com") { |parent| parent.name = "Jane Doe" }
 Admin.find_or_create_by!(email: "admin@example.com") { |admin| admin.name = "Admin User" }
+
+{ "Math" => [ "Fractions Fun", "Shapes and Angles" ], "Science" => [ "Intro to Physics", "Plants and Seeds" ] }.each do |subject_name, titles|
+  class_subject = ClassSubject.find_or_create_by!(name: subject_name)
+  titles.each do |title|
+    class_subject.trial_classes.find_or_create_by!(title:) { |trial_class| trial_class.price_cents = 2500 }
+  end
+end
