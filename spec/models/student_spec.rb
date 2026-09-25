@@ -8,6 +8,20 @@ RSpec.describe Student do
     expect(student.errors[:name]).to include("can't be blank")
   end
 
+  it "requires a name unique among the parent's children" do
+    existing = create(:student, name: "Timmy Doe")
+    student = build(:student, parent: existing.parent, name: " timmy doe ")
+
+    expect(student).not_to be_valid
+    expect(student.errors[:name]).to include("has already been taken")
+  end
+
+  it "allows the same name under different parents" do
+    create(:student, name: "Timmy Doe")
+
+    expect(build(:student, name: "Timmy Doe")).to be_valid
+  end
+
   it "requires a parent" do
     student = build(:student, parent: nil)
 
