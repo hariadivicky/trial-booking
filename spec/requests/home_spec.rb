@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe "Home", type: :request do
+  include ActionView::RecordIdentifier
+
   describe "GET /" do
     it "renders the navbar for a signed-out visitor" do
       get root_path
@@ -38,6 +40,16 @@ RSpec.describe "Home", type: :request do
       assert_select "main a[href=?]", checkout_path(full_class), count: 0
     end
 
+    it "subscribes to each class's seat updates" do
+      trial_class = create(:trial_class)
+
+      get root_path
+
+      assert_select "turbo-cable-stream-source[signed-stream-name=?]", Turbo::StreamsChannel.signed_stream_name(trial_class)
+      assert_select "main li##{dom_id(trial_class)}"
+      assert_select "main li ##{dom_id(trial_class, :seats)}", "4 seats left"
+    end
+
     it "links each trial class to its checkout" do
       trial_class = create(:trial_class, title: "Class A")
 
@@ -60,6 +72,18 @@ RSpec.describe "Home", type: :request do
       assert_select "main li a[href=?]", roster_path(open_class), text: "Class A"
       assert_select "main li a[href=?]", roster_path(full_class), text: "Class B"
       assert_select "main a[href^='/checkout']", count: 0
+    end
+
+    it "keeps an admin's items out of the parent item broadcasts, but live on seats" do
+      admin = create(:admin)
+      post sign_in_otp_path, params: { email: admin.email }
+      post sign_in_path, params: { otp: SessionsController::FAKE_OTP }
+      trial_class = create(:trial_class)
+
+      get root_path
+
+      assert_select "main li##{dom_id(trial_class)}", count: 0
+      assert_select "main li ##{dom_id(trial_class, :seats)}", "4 seats left"
     end
 
     it "shows the reset demo button to an admin only" do

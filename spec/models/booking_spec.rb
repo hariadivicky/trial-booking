@@ -1,4 +1,5 @@
 require "rails_helper"
+require "turbo/broadcastable/test_helper"
 
 RSpec.describe Booking do
   it "defaults to pending status and pending payment" do
@@ -117,6 +118,34 @@ RSpec.describe Booking do
     booking = create(:booking)
 
     expect { booking.update_column(:amount_cents, -1) }.to raise_error(ActiveRecord::StatementInvalid)
+  end
+
+  describe "live seat updates" do
+    include ActiveJob::TestHelper
+    include Turbo::Broadcastable::TestHelper
+    include ActionView::RecordIdentifier
+
+    def broadcasts_from(trial_class, &block)
+      capture_turbo_stream_broadcasts(trial_class) { perform_enqueued_jobs(only: Turbo::Streams::ActionBroadcastJob, &block) }
+        .to_h { [ _1["target"], _1.at("template").text.squish ] }
+    end
+
+    it "pushes the seats left to the class's home item when a seat is held" do
+      trial_class = create(:trial_class, title: "Class A")
+
+      broadcasts = broadcasts_from(trial_class) { create(:booking, trial_class:) }
+
+      expect(broadcasts).to include(dom_id(trial_class, :seats) => "3 seats left", dom_id(trial_class) => "Class A · 3 seats left")
+    end
+
+    it "pushes the freed seat once a hold expires" do
+      trial_class = create(:trial_class, capacity: 1)
+      booking = create(:booking, trial_class:, expires_at: 1.second.ago)
+
+      broadcasts = broadcasts_from(trial_class) { booking.expire! }
+
+      expect(broadcasts).to include(dom_id(trial_class, :seats) => "1 seat left")
+    end
   end
 
   describe ".held" do
