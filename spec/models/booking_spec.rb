@@ -125,8 +125,8 @@ RSpec.describe Booking do
     include Turbo::Broadcastable::TestHelper
     include ActionView::RecordIdentifier
 
-    def broadcasts_from(trial_class, &block)
-      capture_turbo_stream_broadcasts(trial_class) { perform_enqueued_jobs(only: Turbo::Streams::ActionBroadcastJob, &block) }
+    def broadcasts_from(stream, &block)
+      capture_turbo_stream_broadcasts(stream) { perform_enqueued_jobs(only: Turbo::Streams::ActionBroadcastJob, &block) }
         .to_h { [ _1["target"], _1.at("template").text.squish ] }
     end
 
@@ -153,6 +153,16 @@ RSpec.describe Booking do
       broadcasts = broadcasts_from(trial_class) { create(:booking, trial_class:) }
 
       expect(broadcasts).to include(dom_id(trial_class, :availability) => "Sorry, class is fully booked")
+    end
+
+    it "pushes the roster on its own stream only, since it names children and parents" do
+      trial_class = create(:trial_class)
+
+      roster = broadcasts_from([ trial_class, :roster ]) { create(:booking, trial_class:, student: create(:student, name: "Timmy Doe")) }
+      public = broadcasts_from(trial_class) { create(:booking, trial_class:, student: create(:student, name: "Anna Lee")) }
+
+      expect(roster[dom_id(trial_class, :roster)]).to include("Timmy Doe")
+      expect(public.values.join).not_to include("Anna Lee")
     end
   end
 

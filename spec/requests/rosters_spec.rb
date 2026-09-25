@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe "Rosters", type: :request do
+  include ActionView::RecordIdentifier
+
   def sign_in_as(user)
     post sign_in_otp_path, params: { email: user.email }
     post sign_in_path, params: { otp: SessionsController::FAKE_OTP }
@@ -36,6 +38,13 @@ RSpec.describe "Rosters", type: :request do
           "Confirmed" => [ [ "Timmy Doe", "Jane Doe", confirmed.student.parent.email ] ],
           "On hold" => [ [ "Anna Lee", "Mary Lee", held.student.parent.email ] ]
         )
+      end
+
+      it "subscribes to the class's roster updates" do
+        get roster_path(trial_class)
+
+        assert_select "turbo-cable-stream-source[signed-stream-name=?]", Turbo::StreamsChannel.signed_stream_name([ trial_class, :roster ])
+        assert_select "main ##{dom_id(trial_class, :roster)} section", 2
       end
 
       it "keeps a failed payment off the confirmed roster" do
