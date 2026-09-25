@@ -27,6 +27,14 @@ RSpec.describe Parent do
     expect(parent.errors[:email]).to include("has already been taken")
   end
 
+  it "requires an email not used by an admin" do
+    create(:admin, email: "jane@example.com")
+    parent = build(:parent, email: "Jane@Example.com")
+
+    expect(parent).not_to be_valid
+    expect(parent.errors[:email]).to include("has already been taken")
+  end
+
   it "has many students" do
     student = create(:student)
 
