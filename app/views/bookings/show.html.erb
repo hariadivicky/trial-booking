@@ -1,0 +1,20 @@
+<% content_for :title, "Your booking" %>
+
+<div class="mx-auto max-w-md rounded-lg border border-gray-200 bg-white p-6">
+  <h1 class="text-xl font-semibold">Your booking</h1>
+
+  <dl class="mt-6 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 rounded-md bg-gray-50 px-4 py-3 text-sm">
+    <dt class="text-gray-500">Class</dt>
+    <dd class="font-medium"><%= @booking.trial_class.title %></dd>
+    <dt class="text-gray-500">Child</dt>
+    <dd class="font-medium"><%= @booking.student.name %></dd>
+    <dt class="text-gray-500">Amount</dt>
+    <dd class="font-medium"><%= number_to_currency(@booking.amount_cents / 100.0, unit: "SGD ") %></dd>
+    <dt class="text-gray-500">Status</dt>
+    <dd class="font-medium"><%= @booking.status.humanize %></dd>
+    <dt class="text-gray-500">Payment</dt>
+    <dd class="font-medium"><%= @booking.payment_status.humanize %></dd>
+  </dl>
+
+  <%= link_to "Back to classes", root_path, class: "mt-6 block text-center text-sm font-medium text-indigo-600 hover:underline" %>
+</div>
