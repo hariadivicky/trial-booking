@@ -10,6 +10,6 @@ Time spent in each Claude Code conversation, from its first message to its last 
 | 4 | 2026-09-25 | 19:45–19:53 | 9 min | bookings table, trial class price, time log |
 | 5 | 2026-09-25 | 23:04–23:09 | 5 min | payment_attempts design and table |
 | 6 | 2026-09-25 | 23:12–23:14 | 2 min | admins table |
-| 7 | 2026-09-25 | 23:21–23:37 | 16 min | App shell: navbar, sign in/up/out stubs, fake OTP sign in, parent/admin seeds |
+| 7 | 2026-09-25 | 23:21–23:40 | 19 min | App shell: navbar, sign in/up/out stubs, fake OTP sign in, parent/admin seeds, parent sign up |
 
-**Total: ~53 min**
+**Total: ~56 min**
