@@ -119,6 +119,16 @@ RSpec.describe Booking do
     expect { booking.update_column(:amount_cents, -1) }.to raise_error(ActiveRecord::StatementInvalid)
   end
 
+  describe ".held" do
+    it "finds pending holds still inside their deadline" do
+      held = create(:booking)
+      create(:booking, expires_at: 1.second.ago)
+      create(:booking, status: :confirmed)
+
+      expect(Booking.held).to contain_exactly(held)
+    end
+  end
+
   describe ".lapsed" do
     it "finds pending holds past their deadline, whatever the job has done" do
       lapsed = create(:booking, expires_at: 1.second.ago)
