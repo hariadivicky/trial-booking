@@ -57,6 +57,13 @@ RSpec.describe Booking do
     expect(booking).to be_valid
   end
 
+  it "cannot be destroyed while it has payment attempts" do
+    booking = create(:payment_attempt).booking
+
+    expect(booking.destroy).to be_falsey
+    expect(Booking.exists?(booking.id)).to be true
+  end
+
   it "is rejected by the database as a duplicate pending or confirmed booking" do
     existing = create(:booking)
 
