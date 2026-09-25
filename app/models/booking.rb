@@ -17,6 +17,8 @@ class Booking < ApplicationRecord
     self.expires_at ||= HOLD_DURATION.from_now
   end
 
+  after_create_commit { ExpireBookingJob.set(wait_until: expires_at).perform_later(self) }
+
   validates :amount_cents, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :student_id, uniqueness: { scope: :trial_class_id, conditions: -> { where(status: %i[pending confirmed]) }, message: "is already booked in this class" },
     if: -> { pending? || confirmed? }
@@ -25,6 +27,19 @@ class Booking < ApplicationRecord
   # Locks the class row so concurrent checkouts can't both take its last seat.
   def self.hold_seat!(trial_class:, student:)
     trial_class.with_lock { create!(trial_class:, student:) }
+  end
+
+  # Fallback sweep for holds whose expiry job never ran.
+  def self.expire_stale!
+    pending.where(expires_at: ...Time.current).find_each(&:expire!)
+  end
+
+  # Takes the class lock like Payment, so a hold can't expire mid-payment.
+  def expire!
+    trial_class.with_lock do
+      reload
+      expired! if pending? && expires_at.past?
+    end
   end
 
   private
