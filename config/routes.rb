@@ -17,6 +17,7 @@ Rails.application.routes.draw do
   get "sign_up" => "registrations#new"
   post "sign_up" => "registrations#create"
   get "checkout/:trial_class_id" => "checkouts#show", as: :checkout
+  get "pay/:booking_id" => "payments#show", as: :payment
 
   root "home#index"
 end
