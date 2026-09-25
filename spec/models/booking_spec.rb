@@ -46,7 +46,7 @@ RSpec.describe Booking do
     booking = build(:booking, student: existing.student, trial_class: existing.trial_class)
 
     expect(booking).not_to be_valid
-    expect(booking.errors[:student_id]).to include("has already been taken")
+    expect(booking.errors[:student_id]).to include("is already booked in this class")
   end
 
   it "allows rebooking once the earlier booking expired or was canceled" do
@@ -55,6 +55,31 @@ RSpec.describe Booking do
     booking = build(:booking, student: expired.student, trial_class: expired.trial_class)
 
     expect(booking).to be_valid
+  end
+
+  it "rejects a booking once the class is fully booked" do
+    trial_class = create(:trial_class, capacity: 1)
+    create(:booking, trial_class:, status: :confirmed)
+    booking = build(:booking, trial_class:)
+
+    expect(booking).not_to be_valid
+    expect(booking.errors[:base]).to include("This class is fully booked")
+  end
+
+  it "takes the last seat of a class with 3 confirmed students" do
+    trial_class = create(:trial_class)
+    create_list(:booking, 3, trial_class:, status: :confirmed)
+
+    expect(build(:booking, trial_class:)).to be_valid
+  end
+
+  it "counts unexpired holds against the seats but not expired ones" do
+    trial_class = create(:trial_class, capacity: 1)
+    hold = create(:booking, trial_class:)
+    expect(build(:booking, trial_class:)).not_to be_valid
+
+    hold.update!(expires_at: 1.minute.ago)
+    expect(build(:booking, trial_class:)).to be_valid
   end
 
   it "cannot be destroyed while it has payment attempts" do
@@ -86,5 +111,39 @@ RSpec.describe Booking do
     booking = create(:booking)
 
     expect { booking.update_column(:amount_cents, -1) }.to raise_error(ActiveRecord::StatementInvalid)
+  end
+
+  describe ".hold_seat!" do
+    it "holds a pending seat for the student" do
+      booking = Booking.hold_seat!(trial_class: create(:trial_class), student: create(:student))
+
+      expect(booking).to be_persisted
+      expect(booking).to be_pending
+    end
+
+    context "when parents race for the last seat" do
+      self.use_transactional_tests = false
+
+      after { [ Booking, Student, Parent, TrialClass, ClassSubject ].each(&:delete_all) }
+
+      it "lets only one of them hold it" do
+        trial_class = create(:trial_class, capacity: 1)
+        students = create_list(:student, 3)
+        # Widen the gap between counting seats and inserting, so an unlocked check would overbook.
+        allow_any_instance_of(Booking).to receive(:seat_available).and_wrap_original { |original| original.call.tap { sleep 0.1 } }
+
+        students.map { |student|
+          Thread.new do
+            ActiveRecord::Base.connection_pool.with_connection do
+              Booking.hold_seat!(trial_class: TrialClass.find(trial_class.id), student:)
+            rescue ActiveRecord::RecordInvalid
+              nil
+            end
+          end
+        }.each(&:join)
+
+        expect(trial_class.bookings.count).to eq(1)
+      end
+    end
   end
 end
