@@ -31,4 +31,17 @@ RSpec.describe TrialClass do
 
     expect { trial_class.update_column(:capacity, 0) }.to raise_error(ActiveRecord::StatementInvalid)
   end
+
+  it "requires a non-negative price" do
+    trial_class = build(:trial_class, price_cents: -1)
+
+    expect(trial_class).not_to be_valid
+    expect(trial_class.errors[:price_cents]).to include("must be greater than or equal to 0")
+  end
+
+  it "is rejected by the database with a negative price" do
+    trial_class = create(:trial_class)
+
+    expect { trial_class.update_column(:price_cents, -1) }.to raise_error(ActiveRecord::StatementInvalid)
+  end
 end
