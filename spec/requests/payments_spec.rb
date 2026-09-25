@@ -17,7 +17,7 @@ RSpec.describe "Payments", type: :request do
 
       get payment_path(booking)
 
-      assert_select "time[data-controller=countdown][datetime=?]", booking.expires_at.iso8601, text: "15:00"
+      assert_select "time[data-controller=countdown][datetime=?]", booking.expires_at.iso8601, text: "00:30"
     end
 
     it "shows 00:00 once the hold has expired" do
