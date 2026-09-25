@@ -1,0 +1,6 @@
+<div id="<%= dom_id(booking, :status) %>" class="contents">
+  <dt class="text-gray-500">Status</dt>
+  <dd class="font-medium"><%= booking.lapsed? ? "Expired" : booking.status.humanize %></dd>
+  <dt class="text-gray-500">Payment</dt>
+  <dd class="font-medium"><%= booking.payment_status.humanize %></dd>
+</div>

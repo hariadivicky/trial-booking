@@ -1,5 +1,7 @@
 <% content_for :title, "Your booking" %>
 
+<%= turbo_stream_from @booking %>
+
 <div class="mx-auto max-w-md rounded-lg border border-gray-200 bg-white p-6">
   <h1 class="text-xl font-semibold">Your booking</h1>
 
@@ -10,10 +12,7 @@
     <dd class="font-medium"><%= @booking.student.name %></dd>
     <dt class="text-gray-500">Amount</dt>
     <dd class="font-medium"><%= number_to_currency(@booking.amount_cents / 100.0, unit: "SGD ") %></dd>
-    <dt class="text-gray-500">Status</dt>
-    <dd class="font-medium"><%= @booking.lapsed? ? "Expired" : @booking.status.humanize %></dd>
-    <dt class="text-gray-500">Payment</dt>
-    <dd class="font-medium"><%= @booking.payment_status.humanize %></dd>
+    <%= render "bookings/status", booking: @booking %>
   </dl>
 
   <%= link_to "Back to classes", root_path, class: "mt-6 block text-center text-sm font-medium text-indigo-600 hover:underline" %>
