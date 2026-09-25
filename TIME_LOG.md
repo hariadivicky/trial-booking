@@ -8,5 +8,6 @@ Time spent in each Claude Code conversation, from its first message to its last 
 | 2 | 2026-09-25 | 19:23–19:27 | 4 min | RSpec + FactoryBot setup (ran alongside #1) |
 | 3 | 2026-09-25 | 19:32–19:37 | 5 min | parents and students tables |
 | 4 | 2026-09-25 | 19:45–19:53 | 9 min | bookings table, trial class price, time log |
+| 5 | 2026-09-25 | 23:04–23:09 | 5 min | payment_attempts design and table |
 
-**Total: ~30 min**
+**Total: ~35 min**
