@@ -20,6 +20,12 @@ RSpec.describe Booking do
     expect(booking.expires_at).to be_within(5.seconds).of(Booking::HOLD_DURATION.from_now)
   end
 
+  it "schedules its expiry for when the hold ends" do
+    booking = create(:booking)
+
+    expect(ExpireBookingJob).to have_been_enqueued.with(booking).at(booking.expires_at)
+  end
+
   it "requires a student" do
     booking = build(:booking, student: nil)
 
@@ -111,6 +117,47 @@ RSpec.describe Booking do
     booking = create(:booking)
 
     expect { booking.update_column(:amount_cents, -1) }.to raise_error(ActiveRecord::StatementInvalid)
+  end
+
+  describe "#expire!" do
+    it "expires a pending hold once it has passed" do
+      booking = create(:booking, expires_at: 1.second.ago)
+
+      booking.expire!
+
+      expect(booking.reload).to be_expired
+    end
+
+    it "keeps a hold that hasn't passed yet" do
+      booking = create(:booking)
+
+      booking.expire!
+
+      expect(booking.reload).to be_pending
+    end
+
+    it "keeps a booking that was paid before the job ran" do
+      booking = create(:booking, expires_at: 1.second.ago)
+      Booking.where(id: booking.id).update_all(status: "confirmed")
+
+      booking.expire!
+
+      expect(booking.reload).to be_confirmed
+    end
+  end
+
+  describe ".expire_stale!" do
+    it "expires every pending hold that has passed" do
+      stale = create_list(:booking, 2, expires_at: 1.second.ago)
+      fresh = create(:booking)
+      confirmed = create(:booking, status: :confirmed, expires_at: 1.second.ago)
+
+      Booking.expire_stale!
+
+      expect(stale.map { _1.reload.status }).to all(eq("expired"))
+      expect(fresh.reload).to be_pending
+      expect(confirmed.reload).to be_confirmed
+    end
   end
 
   describe ".hold_seat!" do
