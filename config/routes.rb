@@ -19,6 +19,7 @@ Rails.application.routes.draw do
   get "checkout/:trial_class_id" => "checkouts#show", as: :checkout
   post "checkout/:trial_class_id" => "checkouts#create"
   get "pay/:booking_id" => "payments#show", as: :payment
+  post "pay/:booking_id" => "payments#create"
   resources :bookings, only: :show
 
   root "home#index"

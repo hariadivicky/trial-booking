@@ -8,7 +8,18 @@
     <time datetime="<%= @booking.expires_at.iso8601 %>" data-controller="countdown" class="font-semibold tabular-nums"><%= time_left(@booking.expires_at) %></time>
   </p>
 
+  <% if @payment.errors.any? %>
+    <ul class="mt-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">
+      <% @payment.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  <% end %>
+
   <%= form_with scope: :payment, url: payment_path(@booking), class: "mt-6 space-y-4" do |form| %>
+    <%# Each rendered form is one payment attempt, so a double submit can't charge twice. %>
+    <%= form.hidden_field :idempotency_key, value: SecureRandom.uuid %>
+
     <div>
       <%= form.label :card_number, "Card number", class: "block text-sm font-medium" %>
       <%= form.text_field :card_number, required: true, inputmode: "numeric", autocomplete: "cc-number", pattern: "[0-9]{16}", maxlength: 16, aria: { describedby: "card_number_hint" }, class: "mt-1 block w-full rounded-md border border-gray-300 px-3 py-2" %>
