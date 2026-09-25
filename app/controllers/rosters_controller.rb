@@ -7,9 +7,4 @@ class RostersController < ApplicationController
     @confirmed_bookings = bookings.confirmed
     @held_bookings = bookings.held
   end
-
-  private
-    def require_admin
-      redirect_to root_path, alert: "Only admins can see class rosters." unless current_user.is_a?(Admin)
-    end
 end

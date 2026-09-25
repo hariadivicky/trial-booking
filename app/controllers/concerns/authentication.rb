@@ -13,6 +13,10 @@ module Authentication
       nil
     end
 
+    def require_admin
+      redirect_to root_path, alert: "Only admins can do that." unless current_user.is_a?(Admin)
+    end
+
     def find_user_by_email(email)
       Parent.find_by(email:) || Admin.find_by(email:)
     end
