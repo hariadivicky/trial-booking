@@ -17,7 +17,7 @@ RSpec.describe "Payments", type: :request do
 
       get payment_path(booking)
 
-      assert_select "time[data-controller=countdown][datetime=?]", booking.expires_at.iso8601, text: "00:30"
+      assert_select "time[data-controller=countdown][datetime=?]", booking.expires_at.iso8601(3), text: "00:30"
     end
 
     it "sends the parent back to checkout once the hold lapsed, before the job expires it" do
