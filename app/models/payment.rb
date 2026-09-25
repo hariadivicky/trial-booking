@@ -7,6 +7,7 @@ class Payment
     "invalid_expiry" => "Your card's expiry date is invalid or has passed.",
     "invalid_cvv" => "Your CVV must be 3 digits."
   }.freeze
+  HOLD_EXPIRED_MESSAGE = "Your seat hold has expired. Please book again."
 
   attr_accessor :booking, :card_number, :card_expiry, :card_cvv, :idempotency_key
 
@@ -24,7 +25,7 @@ class Payment
 
   private
     def pay
-      return expire_hold unless booking.pending? && booking.expires_at.future?
+      return expire_hold if booking.lapsed? || !booking.pending?
 
       # A resubmitted form reuses its earlier attempt instead of charging again.
       attempt = booking.payment_attempts.find_by(idempotency_key:) || charge
@@ -42,7 +43,7 @@ class Payment
     end
 
     def expire_hold
-      booking.expired! if booking.pending?
-      errors.add(:base, "Your seat hold has expired. Please book again.")
+      booking.expired! if booking.lapsed?
+      errors.add(:base, HOLD_EXPIRED_MESSAGE)
     end
 end

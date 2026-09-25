@@ -10,6 +10,8 @@ class Booking < ApplicationRecord
 
   # A seat is taken by a confirmed booking or a pending one whose hold hasn't expired.
   scope :holding_seat, -> { confirmed.or(pending.where(expires_at: Time.current..)) }
+  # Past its deadline but still pending until the expiry job runs; trust this over the status.
+  scope :lapsed, -> { pending.where(expires_at: ...Time.current) }
 
   # Snapshot the price paid and start the seat hold.
   before_validation on: :create do
@@ -25,21 +27,29 @@ class Booking < ApplicationRecord
   validate :seat_available, on: :create
 
   # Locks the class row so concurrent checkouts can't both take its last seat.
+  # Expires the student's own lapsed hold first, since the unique index only sees status.
   def self.hold_seat!(trial_class:, student:)
-    trial_class.with_lock { create!(trial_class:, student:) }
+    trial_class.with_lock do
+      trial_class.bookings.lapsed.find_by(student:)&.expired!
+      create!(trial_class:, student:)
+    end
   end
 
   # Fallback sweep for holds whose expiry job never ran.
   def self.expire_stale!
-    pending.where(expires_at: ...Time.current).find_each(&:expire!)
+    lapsed.find_each(&:expire!)
   end
 
   # Takes the class lock like Payment, so a hold can't expire mid-payment.
   def expire!
     trial_class.with_lock do
       reload
-      expired! if pending? && expires_at.past?
+      expired! if lapsed?
     end
+  end
+
+  def lapsed?
+    pending? && expires_at.past?
   end
 
   private

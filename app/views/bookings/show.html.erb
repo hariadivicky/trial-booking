@@ -11,7 +11,7 @@
     <dt class="text-gray-500">Amount</dt>
     <dd class="font-medium"><%= number_to_currency(@booking.amount_cents / 100.0, unit: "SGD ") %></dd>
     <dt class="text-gray-500">Status</dt>
-    <dd class="font-medium"><%= @booking.status.humanize %></dd>
+    <dd class="font-medium"><%= @booking.lapsed? ? "Expired" : @booking.status.humanize %></dd>
     <dt class="text-gray-500">Payment</dt>
     <dd class="font-medium"><%= @booking.payment_status.humanize %></dd>
   </dl>
