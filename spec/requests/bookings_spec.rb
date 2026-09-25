@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe "Bookings", type: :request do
+  include ActionView::RecordIdentifier
+
   describe "GET /bookings/:id" do
     it "shows the class, child, amount and booking status" do
       booking = create(:booking, status: :confirmed, payment_status: :paid,
@@ -16,6 +18,15 @@ RSpec.describe "Bookings", type: :request do
       assert_select "dd", "SGD 25.00"
       assert_select "dd", "Confirmed"
       assert_select "dd", "Paid"
+    end
+
+    it "subscribes to its status updates" do
+      booking = create(:booking)
+
+      get booking_path(booking)
+
+      assert_select "turbo-cable-stream-source[signed-stream-name=?]", Turbo::StreamsChannel.signed_stream_name(booking)
+      assert_select "dl ##{dom_id(booking, :status)} dd", 2
     end
 
     it "shows Expired once the hold lapsed, before the job expires it" do

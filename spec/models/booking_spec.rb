@@ -120,7 +120,7 @@ RSpec.describe Booking do
     expect { booking.update_column(:amount_cents, -1) }.to raise_error(ActiveRecord::StatementInvalid)
   end
 
-  describe "live seat updates" do
+  describe "live updates" do
     include ActiveJob::TestHelper
     include Turbo::Broadcastable::TestHelper
     include ActionView::RecordIdentifier
@@ -163,6 +163,14 @@ RSpec.describe Booking do
 
       expect(roster[dom_id(trial_class, :roster)]).to include("Timmy Doe")
       expect(public.values.join).not_to include("Anna Lee")
+    end
+
+    it "pushes its status to its own booking page when it changes" do
+      booking = create(:booking, expires_at: 1.second.ago)
+
+      broadcasts = broadcasts_from(booking) { booking.expire! }
+
+      expect(broadcasts).to eq(dom_id(booking, :status) => "Status Expired Payment Pending")
     end
   end
 
