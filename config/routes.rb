@@ -10,6 +10,9 @@ Rails.application.routes.draw do
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
   get "sign_in" => "sessions#new"
+  post "sign_in" => "sessions#create"
+  get "sign_in/otp" => "otps#show"
+  post "sign_in/otp" => "otps#create"
   delete "sign_out" => "sessions#destroy"
   get "sign_up" => "registrations#new"
 
