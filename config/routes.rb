@@ -22,6 +22,7 @@ Rails.application.routes.draw do
   post "pay/:booking_id" => "payments#create"
   resources :bookings, only: :show
   get "trial_classes/:trial_class_id/roster" => "rosters#show", as: :roster
+  post "demo_reset" => "demo_resets#create"
 
   root "home#index"
 end

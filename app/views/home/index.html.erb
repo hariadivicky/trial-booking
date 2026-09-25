@@ -1,4 +1,11 @@
-<h1 class="text-2xl font-semibold">Book a trial class</h1>
+<div class="flex items-center justify-between">
+  <h1 class="text-2xl font-semibold">Book a trial class</h1>
+
+  <% if current_user.is_a?(Admin) %>
+    <%= button_to "Reset demo", demo_reset_path, form: { data: { turbo_confirm: "Delete all data and reload the seeds? You will be signed out." } },
+      class: "rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700" %>
+  <% end %>
+</div>
 
 <% @trial_classes_by_subject.each do |class_subject, trial_classes| %>
   <section class="mt-6">
