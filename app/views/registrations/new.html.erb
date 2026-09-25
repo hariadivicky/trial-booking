@@ -3,6 +3,28 @@
 <div class="mx-auto max-w-sm rounded-lg border border-gray-200 bg-white p-6">
   <h1 class="text-xl font-semibold">Sign up</h1>
 
+  <% if @parent.errors.any? %>
+    <ul class="mt-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">
+      <% @parent.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <%= form_with model: @parent, url: sign_up_path, class: "mt-6 space-y-4" do |form| %>
+    <div>
+      <%= form.label :name, class: "block text-sm font-medium" %>
+      <%= form.text_field :name, required: true, autofocus: true, autocomplete: "name", class: "mt-1 block w-full rounded-md border border-gray-300 px-3 py-2" %>
+    </div>
+
+    <div>
+      <%= form.label :email, class: "block text-sm font-medium" %>
+      <%= form.email_field :email, required: true, autocomplete: "email", class: "mt-1 block w-full rounded-md border border-gray-300 px-3 py-2" %>
+    </div>
+
+    <%= form.submit "Sign Up", class: "w-full rounded-md bg-indigo-600 px-4 py-2 font-medium text-white hover:bg-indigo-500" %>
+  <% end %>
+
   <p class="mt-4 text-sm text-gray-600">
     Already have an account? <%= link_to "Sign in", sign_in_path, class: "font-medium text-indigo-600 hover:underline" %>
   </p>

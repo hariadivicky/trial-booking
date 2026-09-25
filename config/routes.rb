@@ -15,6 +15,7 @@ Rails.application.routes.draw do
   post "sign_in/otp" => "otps#create"
   delete "sign_out" => "sessions#destroy"
   get "sign_up" => "registrations#new"
+  post "sign_up" => "registrations#create"
 
   root "home#index"
 end
