@@ -1,9 +1,7 @@
 <% content_for :title, "#{@trial_class.title} roster" %>
 
-<h1 class="text-2xl font-semibold"><%= @trial_class.title %> roster</h1>
-<p class="mt-1 text-sm text-gray-600">
-  <%= @confirmed_bookings.size %> of <%= @trial_class.capacity %> confirmed · <%= pluralize(@held_bookings.size, "seat") %> on hold
-</p>
+<%# Its own stream, since the roster names children and parents. %>
+<%= turbo_stream_from @trial_class, :roster %>
 
-<%= render "bookings", title: "Confirmed", bookings: @confirmed_bookings, empty_message: "No confirmed students yet." %>
-<%= render "bookings", title: "On hold", bookings: @held_bookings, empty_message: "No seats on hold." %>
+<h1 class="text-2xl font-semibold"><%= @trial_class.title %> roster</h1>
+<%= render "rosters/roster", trial_class: @trial_class %>

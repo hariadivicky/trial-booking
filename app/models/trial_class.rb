@@ -15,10 +15,15 @@ class TrialClass < ApplicationRecord
     seats_left <= 0
   end
 
+  def roster
+    bookings.eager_load(student: :parent).order("students.name")
+  end
+
   # Pushes the seats left to every page showing this class.
   def broadcast_seats_later
     broadcast_replace_later_to self, partial: "trial_classes/trial_class"
     broadcast_replace_later_to self, target: [ self, :seats ], partial: "trial_classes/seats"
     broadcast_replace_later_to self, target: [ self, :availability ], partial: "checkouts/availability"
+    broadcast_replace_later_to self, :roster, target: [ self, :roster ], partial: "rosters/roster"
   end
 end

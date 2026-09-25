@@ -1,0 +1,11 @@
+<% confirmed_bookings = trial_class.roster.confirmed.to_a %>
+<% held_bookings = trial_class.roster.held.to_a %>
+
+<div id="<%= dom_id(trial_class, :roster) %>">
+  <p class="mt-1 text-sm text-gray-600">
+    <%= confirmed_bookings.size %> of <%= trial_class.capacity %> confirmed · <%= pluralize(held_bookings.size, "seat") %> on hold
+  </p>
+
+  <%= render "rosters/bookings", title: "Confirmed", bookings: confirmed_bookings, empty_message: "No confirmed students yet." %>
+  <%= render "rosters/bookings", title: "On hold", bookings: held_bookings, empty_message: "No seats on hold." %>
+</div>
