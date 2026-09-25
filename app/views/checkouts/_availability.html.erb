@@ -1,0 +1,9 @@
+<% fully_booked = trial_class.fully_booked? %>
+
+<div id="<%= dom_id(trial_class, :availability) %>" class="space-y-4">
+  <% if fully_booked %>
+    <p class="rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">Sorry, class is fully booked</p>
+  <% end %>
+
+  <%= submit_tag "Book trial class", disabled: fully_booked, class: "w-full rounded-md bg-indigo-600 px-4 py-2 font-medium text-white hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-400" %>
+</div>

@@ -10,12 +10,10 @@
     <dd class="font-medium"><%= number_to_currency(@trial_class.price_cents / 100.0, unit: "SGD ") %></dd>
   </dl>
 
-  <% fully_booked = @trial_class.fully_booked? %>
+  <%= turbo_stream_from @trial_class %>
 
   <%# A full class outranks any form error, e.g. when the last seat went mid-checkout. %>
-  <% if fully_booked %>
-    <p class="mt-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">Sorry, class is fully booked</p>
-  <% elsif @checkout.errors.any? %>
+  <% if @checkout.errors.any? && !@trial_class.fully_booked? %>
     <ul class="mt-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">
       <% @checkout.errors.full_messages.each do |message| %>
         <li><%= message %></li>
@@ -63,6 +61,6 @@
       </div>
     </fieldset>
 
-    <%= form.submit "Book trial class", disabled: fully_booked, class: "w-full rounded-md bg-indigo-600 px-4 py-2 font-medium text-white hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-400" %>
+    <%= render "checkouts/availability", trial_class: @trial_class %>
   <% end %>
 </div>

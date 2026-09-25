@@ -19,5 +19,6 @@ class TrialClass < ApplicationRecord
   def broadcast_seats_later
     broadcast_replace_later_to self, partial: "trial_classes/trial_class"
     broadcast_replace_later_to self, target: [ self, :seats ], partial: "trial_classes/seats"
+    broadcast_replace_later_to self, target: [ self, :availability ], partial: "checkouts/availability"
   end
 end
