@@ -3,6 +3,7 @@ class Booking < ApplicationRecord
 
   belongs_to :student
   belongs_to :trial_class
+  has_many :payment_attempts, dependent: :restrict_with_error
 
   enum :status, { pending: "pending", expired: "expired", confirmed: "confirmed", canceled: "canceled" }
   enum :payment_status, { pending: "pending", paid: "paid", failed: "failed" }, prefix: :payment

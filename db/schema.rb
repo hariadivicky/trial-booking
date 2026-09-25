@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_25_124956) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_25_160815) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -46,6 +46,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_25_124956) do
     t.index ["email"], name: "index_parents_on_email", unique: true
   end
 
+  create_table "payment_attempts", force: :cascade do |t|
+    t.bigint "booking_id", null: false
+    t.string "status", null: false
+    t.integer "amount_cents", null: false
+    t.string "failure_reason"
+    t.string "idempotency_key", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["booking_id"], name: "index_payment_attempts_on_booking_id"
+    t.index ["booking_id"], name: "index_payment_attempts_on_booking_succeeded", unique: true, where: "((status)::text = 'succeeded'::text)"
+    t.index ["idempotency_key"], name: "index_payment_attempts_on_idempotency_key", unique: true
+    t.check_constraint "amount_cents >= 0", name: "payment_attempts_amount_cents_non_negative"
+    t.check_constraint "status::text = ANY (ARRAY['succeeded'::character varying, 'failed'::character varying]::text[])", name: "payment_attempts_status_valid"
+  end
+
   create_table "students", force: :cascade do |t|
     t.bigint "parent_id", null: false
     t.string "name", null: false
@@ -68,6 +83,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_25_124956) do
 
   add_foreign_key "bookings", "students"
   add_foreign_key "bookings", "trial_classes"
+  add_foreign_key "payment_attempts", "bookings"
   add_foreign_key "students", "parents"
   add_foreign_key "trial_classes", "class_subjects"
 end
