@@ -44,4 +44,11 @@ RSpec.describe TrialClass do
 
     expect { trial_class.update_column(:price_cents, -1) }.to raise_error(ActiveRecord::StatementInvalid)
   end
+
+  it "cannot be destroyed while it has bookings" do
+    trial_class = create(:booking).trial_class
+
+    expect(trial_class.destroy).to be_falsey
+    expect(TrialClass.exists?(trial_class.id)).to be true
+  end
 end

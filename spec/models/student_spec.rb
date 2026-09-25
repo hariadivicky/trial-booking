@@ -14,4 +14,11 @@ RSpec.describe Student do
     expect(student).not_to be_valid
     expect(student.errors[:parent]).to include("must exist")
   end
+
+  it "cannot be destroyed while it has bookings" do
+    student = create(:booking).student
+
+    expect(student.destroy).to be_falsey
+    expect(Student.exists?(student.id)).to be true
+  end
 end
