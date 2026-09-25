@@ -61,5 +61,17 @@ RSpec.describe "Home", type: :request do
       assert_select "main li a[href=?]", roster_path(full_class), text: "Class B"
       assert_select "main a[href^='/checkout']", count: 0
     end
+
+    it "shows the reset demo button to an admin only" do
+      get root_path
+      assert_select "form[action=?] button", demo_reset_path, count: 0
+
+      admin = create(:admin)
+      post sign_in_otp_path, params: { email: admin.email }
+      post sign_in_path, params: { otp: SessionsController::FAKE_OTP }
+      get root_path
+
+      assert_select "form[action=?][data-turbo-confirm] button", demo_reset_path, text: "Reset demo"
+    end
   end
 end
