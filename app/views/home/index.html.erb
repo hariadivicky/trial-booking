@@ -6,7 +6,10 @@
     <ul class="mt-2 list-disc pl-5">
       <% trial_classes.each do |trial_class| %>
         <li>
-          <% if trial_class.fully_booked? %>
+          <% if current_user.is_a?(Admin) %>
+            <%= link_to trial_class.title, roster_path(trial_class), class: "text-indigo-600 hover:underline" %>
+            · <%= trial_class.fully_booked? ? "Fully booked" : "#{pluralize(trial_class.seats_left, "seat")} left" %>
+          <% elsif trial_class.fully_booked? %>
             <span class="text-gray-500"><%= trial_class.title %> · Fully booked</span>
           <% else %>
             <%= link_to trial_class.title, checkout_path(trial_class), class: "text-indigo-600 hover:underline" %>
