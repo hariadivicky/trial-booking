@@ -5,7 +5,7 @@
     <h2 class="text-lg font-semibold"><%= class_subject.name %></h2>
     <ul class="mt-2 list-disc pl-5">
       <% trial_classes.each do |trial_class| %>
-        <li><%= trial_class.title %></li>
+        <li><%= link_to trial_class.title, checkout_path(trial_class), class: "text-indigo-600 hover:underline" %></li>
       <% end %>
     </ul>
   </section>

@@ -16,6 +16,7 @@ Rails.application.routes.draw do
   delete "sign_out" => "sessions#destroy"
   get "sign_up" => "registrations#new"
   post "sign_up" => "registrations#create"
+  get "checkout/:trial_class_id" => "checkouts#show", as: :checkout
 
   root "home#index"
 end
