@@ -1,5 +1,5 @@
 class Booking < ApplicationRecord
-  HOLD_DURATION = 15.minutes
+  HOLD_DURATION = 30.seconds
 
   belongs_to :student
   belongs_to :trial_class
