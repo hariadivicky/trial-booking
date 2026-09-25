@@ -21,5 +21,13 @@ RSpec.describe "Home", type: :request do
       sections = css_select("main section").map { |section| [ section.at("h2").text, section.css("li").map(&:text) ] }
       expect(sections).to eq([ [ "Math", [ "Class A", "Class C" ] ], [ "Science", [ "Class B" ] ] ])
     end
+
+    it "links each trial class to its checkout" do
+      trial_class = create(:trial_class, title: "Class A")
+
+      get root_path
+
+      assert_select "main li a[href=?]", checkout_path(trial_class), text: "Class A"
+    end
   end
 end
