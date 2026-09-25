@@ -119,6 +119,27 @@ RSpec.describe Booking do
     expect { booking.update_column(:amount_cents, -1) }.to raise_error(ActiveRecord::StatementInvalid)
   end
 
+  describe ".lapsed" do
+    it "finds pending holds past their deadline, whatever the job has done" do
+      lapsed = create(:booking, expires_at: 1.second.ago)
+      create(:booking)
+      create(:booking, status: :confirmed, expires_at: 1.second.ago)
+
+      expect(Booking.lapsed).to contain_exactly(lapsed)
+    end
+  end
+
+  describe "#lapsed?" do
+    it "is true for a pending hold past its deadline" do
+      expect(build(:booking, expires_at: 1.second.ago)).to be_lapsed
+    end
+
+    it "is false before the deadline or once the booking has left pending" do
+      expect(build(:booking, expires_at: 1.minute.from_now)).not_to be_lapsed
+      expect(build(:booking, status: :confirmed, expires_at: 1.second.ago)).not_to be_lapsed
+    end
+  end
+
   describe "#expire!" do
     it "expires a pending hold once it has passed" do
       booking = create(:booking, expires_at: 1.second.ago)
@@ -166,6 +187,15 @@ RSpec.describe Booking do
 
       expect(booking).to be_persisted
       expect(booking).to be_pending
+    end
+
+    it "lets the student book again once their hold lapsed, before the job expires it" do
+      lapsed = create(:booking, expires_at: 1.second.ago)
+
+      booking = Booking.hold_seat!(trial_class: lapsed.trial_class, student: lapsed.student)
+
+      expect(booking).to be_pending
+      expect(lapsed.reload).to be_expired
     end
 
     context "when parents race for the last seat" do

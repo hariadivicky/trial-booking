@@ -17,5 +17,13 @@ RSpec.describe "Bookings", type: :request do
       assert_select "dd", "Confirmed"
       assert_select "dd", "Paid"
     end
+
+    it "shows Expired once the hold lapsed, before the job expires it" do
+      booking = create(:booking, expires_at: 1.second.ago)
+
+      get booking_path(booking)
+
+      assert_select "dd", "Expired"
+    end
   end
 end
