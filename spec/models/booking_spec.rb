@@ -146,6 +146,14 @@ RSpec.describe Booking do
 
       expect(broadcasts).to include(dom_id(trial_class, :seats) => "1 seat left")
     end
+
+    it "tells checkout the class is fully booked once its last seat is held" do
+      trial_class = create(:trial_class, capacity: 1)
+
+      broadcasts = broadcasts_from(trial_class) { create(:booking, trial_class:) }
+
+      expect(broadcasts).to include(dom_id(trial_class, :availability) => "Sorry, class is fully booked")
+    end
   end
 
   describe ".held" do

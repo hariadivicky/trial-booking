@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe "Checkouts", type: :request do
+  include ActionView::RecordIdentifier
+
   def sign_in_as(user)
     post sign_in_otp_path, params: { email: user.email }
     post sign_in_path, params: { otp: SessionsController::FAKE_OTP }
@@ -73,6 +75,13 @@ RSpec.describe "Checkouts", type: :request do
 
       assert_select "main p", "Sorry, class is fully booked"
       assert_select "input[type=submit][disabled]"
+    end
+
+    it "subscribes to the class's seat updates around the book button" do
+      get checkout_path(trial_class)
+
+      assert_select "turbo-cable-stream-source[signed-stream-name=?]", Turbo::StreamsChannel.signed_stream_name(trial_class)
+      assert_select "form ##{dom_id(trial_class, :availability)} input[type=submit]"
     end
 
     it "returns not found for an unknown class" do
