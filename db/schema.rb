@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_25_123424) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_25_124953) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -43,8 +43,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_25_123424) do
     t.integer "capacity", default: 4, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "price_cents", null: false
     t.index ["class_subject_id"], name: "index_trial_classes_on_class_subject_id"
     t.check_constraint "capacity > 0", name: "trial_classes_capacity_positive"
+    t.check_constraint "price_cents >= 0", name: "trial_classes_price_cents_non_negative"
   end
 
   add_foreign_key "students", "parents"
