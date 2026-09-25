@@ -1,0 +1,9 @@
+<%# A parent's home item; the checkout link drops once the class is fully booked. %>
+<li id="<%= dom_id(trial_class) %>">
+  <% if trial_class.fully_booked? %>
+    <span class="text-gray-500"><%= trial_class.title %> · <%= render "trial_classes/seats", trial_class: %></span>
+  <% else %>
+    <%= link_to trial_class.title, checkout_path(trial_class), class: "text-indigo-600 hover:underline" %>
+    · <%= render "trial_classes/seats", trial_class: %>
+  <% end %>
+</li>

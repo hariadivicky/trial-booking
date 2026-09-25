@@ -1,0 +1,1 @@
+<span id="<%= dom_id(trial_class, :seats) %>"><%= trial_class.fully_booked? ? "Fully booked" : "#{pluralize(trial_class.seats_left, "seat")} left" %></span>

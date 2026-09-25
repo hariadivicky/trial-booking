@@ -10,19 +10,20 @@
 <% @trial_classes_by_subject.each do |class_subject, trial_classes| %>
   <section class="mt-6">
     <h2 class="text-lg font-semibold"><%= class_subject.name %></h2>
+    <% trial_classes.each do |trial_class| %>
+      <%= turbo_stream_from trial_class %>
+    <% end %>
+
     <ul class="mt-2 list-disc pl-5">
       <% trial_classes.each do |trial_class| %>
-        <li>
-          <% if current_user.is_a?(Admin) %>
+        <% if current_user.is_a?(Admin) %>
+          <li>
             <%= link_to trial_class.title, roster_path(trial_class), class: "text-indigo-600 hover:underline" %>
-            · <%= trial_class.fully_booked? ? "Fully booked" : "#{pluralize(trial_class.seats_left, "seat")} left" %>
-          <% elsif trial_class.fully_booked? %>
-            <span class="text-gray-500"><%= trial_class.title %> · Fully booked</span>
-          <% else %>
-            <%= link_to trial_class.title, checkout_path(trial_class), class: "text-indigo-600 hover:underline" %>
-            · <%= pluralize(trial_class.seats_left, "seat") %> left
-          <% end %>
-        </li>
+            · <%= render "trial_classes/seats", trial_class: %>
+          </li>
+        <% else %>
+          <%= render trial_class %>
+        <% end %>
       <% end %>
     </ul>
   </section>

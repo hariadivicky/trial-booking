@@ -21,6 +21,7 @@ class Booking < ApplicationRecord
   end
 
   after_create_commit { ExpireBookingJob.set(wait_until: expires_at).perform_later(self) }
+  after_commit { trial_class.broadcast_seats_later }
 
   validates :amount_cents, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :student_id, uniqueness: { scope: :trial_class_id, conditions: -> { where(status: %i[pending confirmed]) }, message: "is already booked in this class" },

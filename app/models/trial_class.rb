@@ -14,4 +14,10 @@ class TrialClass < ApplicationRecord
   def fully_booked?
     seats_left <= 0
   end
+
+  # Pushes the seats left to every page showing this class.
+  def broadcast_seats_later
+    broadcast_replace_later_to self, partial: "trial_classes/trial_class"
+    broadcast_replace_later_to self, target: [ self, :seats ], partial: "trial_classes/seats"
+  end
 end
