@@ -45,5 +45,21 @@ RSpec.describe "Home", type: :request do
 
       assert_select "main li a[href=?]", checkout_path(trial_class), text: "Class A"
     end
+
+    it "links each class to its roster instead of checkout for an admin, even when fully booked" do
+      admin = create(:admin)
+      post sign_in_otp_path, params: { email: admin.email }
+      post sign_in_path, params: { otp: SessionsController::FAKE_OTP }
+      open_class = create(:trial_class, title: "Class A")
+      full_class = create(:trial_class, title: "Class B", capacity: 1)
+      create(:booking, trial_class: full_class, status: :confirmed)
+
+      get root_path
+
+      expect(css_select("main li").map { _1.text.squish }).to contain_exactly("Class A · 4 seats left", "Class B · Fully booked")
+      assert_select "main li a[href=?]", roster_path(open_class), text: "Class A"
+      assert_select "main li a[href=?]", roster_path(full_class), text: "Class B"
+      assert_select "main a[href^='/checkout']", count: 0
+    end
   end
 end
