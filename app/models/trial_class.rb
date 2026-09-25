@@ -1,5 +1,6 @@
 class TrialClass < ApplicationRecord
   belongs_to :class_subject
+  has_many :bookings, dependent: :restrict_with_error
 
   validates :title, presence: true
   validates :capacity, numericality: { only_integer: true, greater_than: 0 }

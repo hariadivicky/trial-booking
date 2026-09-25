@@ -10,9 +10,26 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_25_124953) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_25_124956) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "bookings", force: :cascade do |t|
+    t.bigint "student_id", null: false
+    t.bigint "trial_class_id", null: false
+    t.string "status", default: "pending", null: false
+    t.string "payment_status", default: "pending", null: false
+    t.integer "amount_cents", null: false
+    t.datetime "expires_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["student_id", "trial_class_id"], name: "index_bookings_on_student_and_class_live", unique: true, where: "((status)::text = ANY ((ARRAY['pending'::character varying, 'confirmed'::character varying])::text[]))"
+    t.index ["student_id"], name: "index_bookings_on_student_id"
+    t.index ["trial_class_id"], name: "index_bookings_on_trial_class_id"
+    t.check_constraint "amount_cents >= 0", name: "bookings_amount_cents_non_negative"
+    t.check_constraint "payment_status::text = ANY (ARRAY['pending'::character varying, 'paid'::character varying, 'failed'::character varying]::text[])", name: "bookings_payment_status_valid"
+    t.check_constraint "status::text = ANY (ARRAY['pending'::character varying, 'expired'::character varying, 'confirmed'::character varying, 'canceled'::character varying]::text[])", name: "bookings_status_valid"
+  end
 
   create_table "class_subjects", force: :cascade do |t|
     t.string "name", null: false
@@ -49,6 +66,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_25_124953) do
     t.check_constraint "price_cents >= 0", name: "trial_classes_price_cents_non_negative"
   end
 
+  add_foreign_key "bookings", "students"
+  add_foreign_key "bookings", "trial_classes"
   add_foreign_key "students", "parents"
   add_foreign_key "trial_classes", "class_subjects"
 end
