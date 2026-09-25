@@ -8,6 +8,9 @@ class Booking < ApplicationRecord
   enum :status, { pending: "pending", expired: "expired", confirmed: "confirmed", canceled: "canceled" }
   enum :payment_status, { pending: "pending", paid: "paid", failed: "failed" }, prefix: :payment
 
+  # A seat is taken by a confirmed booking or a pending one whose hold hasn't expired.
+  scope :holding_seat, -> { confirmed.or(pending.where(expires_at: Time.current..)) }
+
   # Snapshot the price paid and start the seat hold.
   before_validation on: :create do
     self.amount_cents ||= trial_class&.price_cents
