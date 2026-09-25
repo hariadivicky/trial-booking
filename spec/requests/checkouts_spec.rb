@@ -62,8 +62,17 @@ RSpec.describe "Checkouts", type: :request do
       get checkout_path(trial_class)
 
       assert_select "form[action=?][method=post]", checkout_path(trial_class) do
-        assert_select "input[type=submit][value=?]", "Book trial class"
+        assert_select "input[type=submit]:not([disabled])[value=?]", "Book trial class"
       end
+    end
+
+    it "tells the parent a fully booked class has no seats and disables booking" do
+      create_list(:booking, 4, trial_class:, status: :confirmed)
+
+      get checkout_path(trial_class)
+
+      assert_select "main p", "Sorry, class is fully booked"
+      assert_select "input[type=submit][disabled]"
     end
 
     it "returns not found for an unknown class" do
@@ -185,7 +194,8 @@ RSpec.describe "Checkouts", type: :request do
       expect { book(parent_name: "Jane Doe", parent_email: "jane@example.com", student_name: "Timmy Doe") }
         .not_to change { [ Parent.count, Student.count, Booking.count ] }
       expect(response).to have_http_status(:unprocessable_entity)
-      assert_select "main li", "This class is fully booked"
+      assert_select "main p", "Sorry, class is fully booked"
+      assert_select "input[type=submit][disabled]"
     end
 
     it "does not let an admin book" do
