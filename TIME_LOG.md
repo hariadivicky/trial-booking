@@ -17,5 +17,6 @@ Time spent in each Claude Code conversation, from its first message to its last 
 | 11 | 2026-09-26 | 00:36–00:48 | 12 min | MockPaymentGateway PORO, pay a held seat (retry, idempotency key, expired hold), booking status page |
 | 12 | 2026-09-26 | 00:53–00:56 | 3 min | Checkout shows "Sorry, class is fully booked" and disables booking when no seats are left |
 | 13 | 2026-09-26 | 00:58–01:15 | 17 min | Expire unpaid holds: ExpireBookingJob at hold expiry, 30s recurring sweep, Solid Queue on the primary DB; lapsed holds trusted over status (rebook, booking page, pay page redirect) |
+| 14 | 2026-09-26 | 01:18–01:26 | 8 min | Admin class roster: `held` scope, roster page (confirmed + live holds, admin only), roster links on home page for admins |
 
-**Total: ~126 min**
+**Total: ~134 min**
