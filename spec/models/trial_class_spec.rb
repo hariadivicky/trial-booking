@@ -45,6 +45,26 @@ RSpec.describe TrialClass do
     expect { trial_class.update_column(:price_cents, -1) }.to raise_error(ActiveRecord::StatementInvalid)
   end
 
+  it "counts confirmed bookings and unexpired holds against seats left" do
+    trial_class = create(:trial_class)
+    create(:booking, trial_class: trial_class, status: :confirmed)
+    create(:booking, trial_class: trial_class)
+    create(:booking, trial_class: trial_class, expires_at: 1.minute.ago)
+    create(:booking, trial_class: trial_class, status: :expired)
+    create(:booking, trial_class: trial_class, status: :canceled)
+
+    expect(trial_class.seats_left).to eq(2)
+    expect(trial_class).not_to be_fully_booked
+  end
+
+  it "is fully booked when no seats are left" do
+    trial_class = create(:trial_class, capacity: 1)
+    create(:booking, trial_class: trial_class, status: :confirmed)
+
+    expect(trial_class.seats_left).to eq(0)
+    expect(trial_class).to be_fully_booked
+  end
+
   it "cannot be destroyed while it has bookings" do
     trial_class = create(:booking).trial_class
 

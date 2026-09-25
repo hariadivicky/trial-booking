@@ -18,8 +18,24 @@ RSpec.describe "Home", type: :request do
 
       get root_path
 
-      sections = css_select("main section").map { |section| [ section.at("h2").text, section.css("li").map(&:text) ] }
-      expect(sections).to eq([ [ "Math", [ "Class A", "Class C" ] ], [ "Science", [ "Class B" ] ] ])
+      sections = css_select("main section").map { |section| [ section.at("h2").text, section.css("li").map { _1.text.squish } ] }
+      expect(sections).to eq([
+        [ "Math", [ "Class A · 4 seats left", "Class C · 4 seats left" ] ],
+        [ "Science", [ "Class B · 4 seats left" ] ]
+      ])
+    end
+
+    it "shows seats left and drops the checkout link once a class is fully booked" do
+      open_class = create(:trial_class, title: "Class A")
+      full_class = create(:trial_class, title: "Class B", capacity: 1)
+      create(:booking, trial_class: open_class, status: :confirmed)
+      create(:booking, trial_class: full_class, status: :confirmed)
+
+      get root_path
+
+      expect(css_select("main li").map { _1.text.squish }).to contain_exactly("Class A · 3 seats left", "Class B · Fully booked")
+      assert_select "main a[href=?]", checkout_path(open_class)
+      assert_select "main a[href=?]", checkout_path(full_class), count: 0
     end
 
     it "links each trial class to its checkout" do
