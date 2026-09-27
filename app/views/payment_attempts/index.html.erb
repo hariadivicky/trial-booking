@@ -1,6 +1,16 @@
 <% title = @booking ? "Payment log" : "Payments" %>
 <% content_for :title, title %>
 
+<%# Admin-only streams, since each row names the child and parent. %>
+<% if @booking %>
+  <%= turbo_stream_from @booking, :payment_attempts %>
+  <%= turbo_stream_from @booking %>
+<% else %>
+  <%= turbo_stream_from :payment_attempts %>
+<% end %>
+<%# A cached preview resubscribes to the same stream, and Action Cable can drop it (turbo-rails#173). %>
+<% turbo_exempts_page_from_preview %>
+
 <h1 class="text-2xl font-semibold"><%= title %></h1>
 
 <% if @booking %>
