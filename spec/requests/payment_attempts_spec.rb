@@ -41,6 +41,14 @@ RSpec.describe "Payment attempts", type: :request do
         assert_select "main td a[href=?]", booking_payment_attempts_path(booking), text: "Timmy Doe"
       end
 
+      it "subscribes to new attempts and skips Turbo's cached preview" do
+        get payment_attempts_path
+
+        assert_select "turbo-cable-stream-source[signed-stream-name=?]", Turbo::StreamsChannel.signed_stream_name(:payment_attempts)
+        assert_select "main tbody#payment_attempts"
+        assert_select "head meta[name='turbo-cache-control'][content='no-preview']"
+      end
+
       it "says so when there are no attempts yet" do
         get payment_attempts_path
 
@@ -77,6 +85,14 @@ RSpec.describe "Payment attempts", type: :request do
       assert_select "h1", "Payment log"
       expect(css_select("main dd").map(&:text)).to eq([ "Intro to Physics", "Timmy Doe", "Jane Doe", "Pending", "Failed" ])
       expect(attempt_rows.map(&:last)).to eq([ "Invalid expiry" ])
+    end
+
+    it "subscribes to the booking's new attempts and status" do
+      get booking_payment_attempts_path(booking)
+
+      assert_select "turbo-cable-stream-source[signed-stream-name=?]", Turbo::StreamsChannel.signed_stream_name([ booking, :payment_attempts ])
+      assert_select "turbo-cable-stream-source[signed-stream-name=?]", Turbo::StreamsChannel.signed_stream_name(booking)
+      assert_select "turbo-cable-stream-source[signed-stream-name=?]", Turbo::StreamsChannel.signed_stream_name(:payment_attempts), count: 0
     end
 
     it "sends a parent home" do

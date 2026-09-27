@@ -1,4 +1,5 @@
 require "rails_helper"
+require "turbo/broadcastable/test_helper"
 
 RSpec.describe PaymentAttempt do
   it "copies the booking amount" do
@@ -75,5 +76,33 @@ RSpec.describe PaymentAttempt do
     attempt = create(:payment_attempt)
 
     expect { attempt.update_column(:amount_cents, -1) }.to raise_error(ActiveRecord::StatementInvalid)
+  end
+
+  describe "live updates" do
+    include ActiveJob::TestHelper
+    include Turbo::Broadcastable::TestHelper
+
+    def broadcasts_from(stream, &block)
+      capture_turbo_stream_broadcasts(stream) { perform_enqueued_jobs(only: Turbo::Streams::ActionBroadcastJob, &block) }
+        .map { [ _1["action"], _1["target"], _1.at("template").text.squish ] }
+    end
+
+    let(:booking) { create(:booking, student: create(:student, name: "Timmy Doe")) }
+
+    it "prepends itself to the admin payments list" do
+      broadcasts = broadcasts_from(:payment_attempts) { create(:payment_attempt, booking:) }
+
+      expect(broadcasts).to match([ [ "prepend", "payment_attempts", include("Timmy Doe") ] ])
+    end
+
+    it "prepends itself to its booking's payment log" do
+      broadcasts = broadcasts_from([ booking, :payment_attempts ]) { create(:payment_attempt, booking:) }
+
+      expect(broadcasts).to match([ [ "prepend", "payment_attempts", include("Timmy Doe") ] ])
+    end
+
+    it "stays off the booking's public page stream, since it names the parent" do
+      expect(broadcasts_from(booking) { create(:payment_attempt, booking:) }).to be_empty
+    end
   end
 end
