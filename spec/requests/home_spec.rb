@@ -97,5 +97,17 @@ RSpec.describe "Home", type: :request do
 
       assert_select "form[action=?][data-turbo-confirm] button", demo_reset_path, text: "Reset demo"
     end
+
+    it "links an admin only to the payments list" do
+      get root_path
+      assert_select "a[href=?]", payment_attempts_path, count: 0
+
+      admin = create(:admin)
+      post sign_in_otp_path, params: { email: admin.email }
+      post sign_in_path, params: { otp: SessionsController::FAKE_OTP }
+      get root_path
+
+      assert_select "main a[href=?]", payment_attempts_path, text: "Payments"
+    end
   end
 end

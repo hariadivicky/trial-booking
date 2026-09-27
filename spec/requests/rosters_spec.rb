@@ -40,6 +40,16 @@ RSpec.describe "Rosters", type: :request do
         )
       end
 
+      it "links each child to their booking's payment log" do
+        confirmed = book("Timmy Doe", "Jane Doe", status: :confirmed, payment_status: :paid)
+        held = book("Anna Lee", "Mary Lee")
+
+        get roster_path(trial_class)
+
+        assert_select "main td a[href=?]", booking_payment_attempts_path(confirmed), text: "Timmy Doe"
+        assert_select "main td a[href=?]", booking_payment_attempts_path(held), text: "Anna Lee"
+      end
+
       it "subscribes to the class's roster updates" do
         get roster_path(trial_class)
 
