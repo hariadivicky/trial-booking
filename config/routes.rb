@@ -20,7 +20,10 @@ Rails.application.routes.draw do
   post "checkout/:trial_class_id" => "checkouts#create"
   get "pay/:booking_id" => "payments#show", as: :payment
   post "pay/:booking_id" => "payments#create"
-  resources :bookings, only: :show
+  resources :bookings, only: :show do
+    resources :payment_attempts, only: :index
+  end
+  resources :payment_attempts, only: :index
   get "trial_classes/:trial_class_id/roster" => "rosters#show", as: :roster
   post "demo_reset" => "demo_resets#create"
 

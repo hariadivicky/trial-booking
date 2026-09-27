@@ -1,0 +1,33 @@
+<% title = @booking ? "Payment log" : "Payments" %>
+<% content_for :title, title %>
+
+<h1 class="text-2xl font-semibold"><%= title %></h1>
+
+<% if @booking %>
+  <dl class="mt-4 grid max-w-md grid-cols-[auto_1fr] gap-x-4 gap-y-1 rounded-md bg-white px-4 py-3 text-sm">
+    <dt class="text-gray-500">Class</dt>
+    <dd class="font-medium"><%= @booking.trial_class.title %></dd>
+    <dt class="text-gray-500">Child</dt>
+    <dd class="font-medium"><%= @booking.student.name %></dd>
+    <dt class="text-gray-500">Parent</dt>
+    <dd class="font-medium"><%= @booking.student.parent.name %></dd>
+    <%= render "bookings/status", booking: @booking %>
+  </dl>
+<% end %>
+
+<table class="mt-6 w-full rounded-md bg-white text-left text-sm">
+  <thead class="text-gray-500">
+    <tr>
+      <% %w[Time Class Child Parent Amount Status Reason].each do |heading| %>
+        <th class="px-3 py-2"><%= heading %></th>
+      <% end %>
+    </tr>
+  </thead>
+  <tbody id="payment_attempts">
+    <% if @payment_attempts.empty? %>
+      <%# Hides itself once a live row is prepended beside it. %>
+      <tr class="hidden only:table-row"><td colspan="7" class="px-3 py-2 text-gray-500">No payments yet.</td></tr>
+    <% end %>
+    <%= render @payment_attempts %>
+  </tbody>
+</table>

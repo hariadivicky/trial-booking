@@ -1,0 +1,11 @@
+<% booking = payment_attempt.booking %>
+
+<tr id="<%= dom_id(payment_attempt) %>" class="border-t border-gray-200">
+  <td class="px-3 py-2"><%= payment_attempt.created_at.to_fs(:short) %></td>
+  <td class="px-3 py-2"><%= booking.trial_class.title %></td>
+  <td class="px-3 py-2"><%= link_to booking.student.name, booking_payment_attempts_path(booking), class: "text-indigo-600 hover:underline" %></td>
+  <td class="px-3 py-2"><%= booking.student.parent.name %></td>
+  <td class="px-3 py-2"><%= number_to_currency(payment_attempt.amount_cents / 100.0, unit: "SGD ") %></td>
+  <td class="px-3 py-2"><%= payment_attempt.status.humanize %></td>
+  <td class="px-3 py-2"><%= payment_attempt.failure_reason&.humanize %></td>
+</tr>

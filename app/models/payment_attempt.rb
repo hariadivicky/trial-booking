@@ -3,6 +3,9 @@ class PaymentAttempt < ApplicationRecord
 
   enum :status, { succeeded: "succeeded", failed: "failed" }
 
+  # Newest first, with the booking details each log row shows.
+  scope :log, -> { includes(booking: [ :trial_class, { student: :parent } ]).order(created_at: :desc) }
+
   before_validation on: :create do
     self.amount_cents ||= booking&.amount_cents
   end
