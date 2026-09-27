@@ -47,6 +47,12 @@ RSpec.describe "Rosters", type: :request do
         assert_select "main ##{dom_id(trial_class, :roster)} section", 2
       end
 
+      it "skips Turbo's cached preview so a revisit keeps its roster subscription" do
+        get roster_path(trial_class)
+
+        assert_select "head meta[name='turbo-cache-control'][content='no-preview']"
+      end
+
       it "keeps a failed payment off the confirmed roster" do
         book("Timmy Doe", "Jane Doe", payment_status: :failed)
 
