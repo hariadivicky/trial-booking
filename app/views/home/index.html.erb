@@ -2,8 +2,11 @@
   <h1 class="text-2xl font-semibold">Book a trial class</h1>
 
   <% if current_user.is_a?(Admin) %>
-    <%= button_to "Reset demo", demo_reset_path, form: { data: { turbo_confirm: "Delete all data and reload the seeds? You will be signed out." } },
-      class: "rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700" %>
+    <div class="flex items-center gap-4">
+      <%= link_to "Payments", payment_attempts_path, class: "text-sm font-medium text-indigo-600 hover:underline" %>
+      <%= button_to "Reset demo", demo_reset_path, form: { data: { turbo_confirm: "Delete all data and reload the seeds? You will be signed out." } },
+        class: "rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700" %>
+    </div>
   <% end %>
 </div>
 

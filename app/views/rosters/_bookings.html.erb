@@ -9,7 +9,7 @@
       <tbody>
         <% bookings.each do |booking| %>
           <tr class="border-t border-gray-200">
-            <td class="px-3 py-2"><%= booking.student.name %></td>
+            <td class="px-3 py-2"><%= link_to booking.student.name, booking_payment_attempts_path(booking), class: "text-indigo-600 hover:underline" %></td>
             <td class="px-3 py-2"><%= booking.student.parent.name %></td>
             <td class="px-3 py-2"><%= booking.student.parent.email %></td>
           </tr>
