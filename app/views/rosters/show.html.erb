@@ -2,6 +2,8 @@
 
 <%# Its own stream, since the roster names children and parents. %>
 <%= turbo_stream_from @trial_class, :roster %>
+<%# A cached preview resubscribes to the same stream, and Action Cable can drop it (turbo-rails#173). %>
+<% turbo_exempts_page_from_preview %>
 
 <h1 class="text-2xl font-semibold"><%= @trial_class.title %> roster</h1>
 <%= render "rosters/roster", trial_class: @trial_class %>
