@@ -21,5 +21,6 @@ Time spent in each Claude Code conversation, from its first message to its last 
 | 15 | 2026-09-26 | 01:43–02:02 | 19 min | Live booking updates over Turbo Streams: Solid Cable on the primary DB, home seats, checkout fully booked notice, admin-only roster stream, booking status, pay page reload on hold expiry |
 | 16 | 2026-09-26 | 02:06–02:14 | 8 min | AI_USAGE.md from session transcripts |
 | 17 | 2026-09-27 | 16:33–16:44 | 11 min | Fix admin roster missing live hold expiry: Turbo cached preview dropped its stream subscription, roster now skips the preview |
+| 18 | 2026-09-27 | 16:46–16:56 | 10 min | Admin payments list and per-booking payment log (`PaymentAttemptsController`, nested under bookings), links from home and roster, live admin-only attempt stream |
 
-**Total: ~187 min**
+**Total: ~197 min**
