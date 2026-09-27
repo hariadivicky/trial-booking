@@ -20,5 +20,6 @@ Time spent in each Claude Code conversation, from its first message to its last 
 | 14 | 2026-09-26 | 01:18–01:41 | 23 min | Admin class roster: `held` scope, roster page (confirmed + live holds, admin only), roster links on home page for admins; seed Plants and Seeds with 3 confirmed students; admin reset demo button (replant minus Solid Queue tables) |
 | 15 | 2026-09-26 | 01:43–02:02 | 19 min | Live booking updates over Turbo Streams: Solid Cable on the primary DB, home seats, checkout fully booked notice, admin-only roster stream, booking status, pay page reload on hold expiry |
 | 16 | 2026-09-26 | 02:06–02:14 | 8 min | AI_USAGE.md from session transcripts |
+| 17 | 2026-09-27 | 16:33–16:44 | 11 min | Fix admin roster missing live hold expiry: Turbo cached preview dropped its stream subscription, roster now skips the preview |
 
-**Total: ~176 min**
+**Total: ~187 min**
