@@ -22,5 +22,6 @@ Time spent in each Claude Code conversation, from its first message to its last 
 | 16 | 2026-09-26 | 02:06–02:14 | 8 min | AI_USAGE.md from session transcripts |
 | 17 | 2026-09-27 | 16:33–16:44 | 11 min | Fix admin roster missing live hold expiry: Turbo cached preview dropped its stream subscription, roster now skips the preview |
 | 18 | 2026-09-27 | 16:46–16:56 | 10 min | Admin payments list and per-booking payment log (`PaymentAttemptsController`, nested under bookings), links from home and roster, live admin-only attempt stream |
+| 19 | 2026-09-27 | 17:04–17:07 | 3 min | README backend/design section: data model, endpoints, statuses, duplicates, payment failure, last-seat race, checks per layer |
 
-**Total: ~197 min**
+**Total: ~200 min**
